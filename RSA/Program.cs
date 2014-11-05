@@ -20,14 +20,17 @@ namespace RSA
             ulong q = x - y;
 
             //Алгоритм Евклида 
+            ulong d = evclid(p - 1, q - 1);
 
-            //Console.WriteLine("p=" + p + " q=" + q);
+            Console.WriteLine("p=" + p + " q=" + q + " d=" + d);
 
             Console.ReadLine();
         }
 
+
         public static ulong fact(ulong n) // Метод факторизации Ферма: x^2-y^2=n, (x-y)(x+y)=n, n=a*b, a=x+y, b=x-y
         {
+            Console.WriteLine("Факторизация начата: " + System.DateTime.Now);
             ulong k = 0;
 
             for (k = 0; ; k++)
@@ -37,7 +40,29 @@ namespace RSA
                     break;
             }
 
-                return (ulong)(Math.Truncate(Math.Sqrt(n)) + 1 + k);
+            Console.WriteLine("Факторизация закончена: " + System.DateTime.Now);
+
+            return (ulong)(Math.Truncate(Math.Sqrt(n)) + 1 + k);
+        }
+
+
+        public static ulong evclid(ulong x, ulong y)
+        {
+            Console.WriteLine("Поиск взаимнопростого d: " + System.DateTime.Now);
+
+            ulong r, a = x, b = y;
+            do
+            {
+                r = a % b;
+                a = b;
+                b = r;
+            }
+            while (r != 0);
+
+            Console.WriteLine("d найдено: " + System.DateTime.Now);
+
+            return a;
+
         }
     }
 }
