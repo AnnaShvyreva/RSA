@@ -12,21 +12,28 @@ namespace RSA
         {
             ulong n = 471166331128397;
             ulong e = 12971;
-            //ulong text = 25179548613190511513070917903946655028427025822969873262852057834743091062127365909095368;
-            //Console.WriteLine(fact(n));
-            ulong x = fact(n);
-            ulong y = (ulong)Math.Sqrt(Math.Pow(x,2) - n);
-            ulong p = x + y;
-            ulong q = x - y;
+            string text = "25179548613190511513070917903946655028427025822969873262852057834743091062127365909095368";
 
-            //Алгоритм Евклида 
-            ulong d = evclid(p - 1, q - 1);
+            ulong m = eiler(n);
 
-            Console.WriteLine("p=" + p + " q=" + q + " d=" + d);
+            ulong d = d_found(e, m);
+            
+            Console.WriteLine("функция Эйлера (n) = " + m);
+            Console.WriteLine("Открытый ключ:{ " + e + ", " + n + "}");
+            Console.WriteLine("Закрытый ключ:{ " + d + ", " + n + "}");
 
             Console.ReadLine();
         }
 
+        public static ulong eiler(ulong n)
+        {
+            ulong x = fact(n);
+            ulong y = (ulong)Math.Sqrt(Math.Pow(x, 2) - n);
+            ulong p = x + y;
+            ulong q = x - y;
+
+            return (p - 1) * (q - 1);
+        }
 
         public static ulong fact(ulong n) // Метод факторизации Ферма: x^2-y^2=n, (x-y)(x+y)=n, n=a*b, a=x+y, b=x-y
         {
@@ -45,8 +52,8 @@ namespace RSA
             return (ulong)(Math.Truncate(Math.Sqrt(n)) + 1 + k);
         }
 
-
-        public static ulong evclid(ulong x, ulong y)
+        /*
+        public static ulong evclid(ulong x, ulong y) //алгоритм Евклида НОД
         {
             Console.WriteLine("Поиск взаимнопростого d: " + System.DateTime.Now);
 
@@ -63,6 +70,32 @@ namespace RSA
 
             return a;
 
+        }*/
+
+        public static ulong d_found(ulong e, ulong m)
+        {
+            ulong d=0;
+            for (ulong i = 0;; i++)
+            {
+                if ((m * i + 1) % e == 0)
+                {
+                    d = (m * i + 1) / e; // d = 14856753466211
+                    break;
+                }
+            }
+            return d;
+        }        
+        
+        public static ulong d_found1(ulong e, ulong m, ulong n)
+        {
+            ulong x = eiler(m);
+            ulong tmp = (ulong)Math.Pow(e, x - 1); //возведение в степень не работает!
+            ulong d1 = tmp % n;
+            Console.WriteLine("d1 = " + d1);
+            ulong d = tmp % m;
+            Console.WriteLine("d = " + d);
+
+            return d;
         }
     }
 }
