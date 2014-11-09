@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.IO;
+using System.Numerics;
+using System.Text.RegularExpressions;
+
 namespace RSA
 {
     class Program
@@ -18,10 +22,50 @@ namespace RSA
 
             ulong d = d_found(e, m);
             
-            Console.WriteLine("функция Эйлера (n) = " + m);
+            Console.WriteLine("функция Эйлера(n) = " + m);
             Console.WriteLine("Открытый ключ:{ " + e + ", " + n + "}");
             Console.WriteLine("Закрытый ключ:{ " + d + ", " + n + "}");
 
+
+            //Console.WriteLine("d/m = " + d / m + " d%m = " + d % m);
+            // разбиение на блоки и дешифровка
+            string textRes = "";
+            Console.WriteLine(text);
+            string s = "";
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (Convert.ToUInt64(s + text[i]) >= n || (i==text.Length-1 && s != ""))
+                {
+                    if (i == text.Length - 1 && s != "") s = s + text[i];
+                    //Console.Write("s= " + s+ " ");
+                    textRes =textRes + decryption(s, d, n);
+                    //Console.WriteLine();
+                    i--;
+                    s = ""; 
+                }
+                else
+                {
+                    s = s + text[i];
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine(textRes);
+
+            if (textRes.Length % 2 != 0)
+            {
+                textRes = "0" + textRes;
+            }
+
+            byte[] res_text = new byte[textRes.Length / 2];
+            for (int i = 0; i < res_text.Length; i++)
+            {
+                res_text[i] = Convert.ToByte(Convert.ToString(textRes[i * 2]) + Convert.ToString(textRes[i * 2 + 1]));
+            }
+            string message = Encoding.Default.GetString(res_text);
+
+            Console.WriteLine(message);
+            
             Console.ReadLine();
         }
 
@@ -37,7 +81,7 @@ namespace RSA
 
         public static ulong fact(ulong n) // Метод факторизации Ферма: x^2-y^2=n, (x-y)(x+y)=n, n=a*b, a=x+y, b=x-y
         {
-            Console.WriteLine("Факторизация начата: " + System.DateTime.Now);
+            //Console.WriteLine("Факторизация начата: " + System.DateTime.Now);
             ulong k = 0;
 
             for (k = 0; ; k++)
@@ -47,7 +91,7 @@ namespace RSA
                     break;
             }
 
-            Console.WriteLine("Факторизация закончена: " + System.DateTime.Now);
+            //Console.WriteLine("Факторизация закончена: " + System.DateTime.Now);
 
             return (ulong)(Math.Truncate(Math.Sqrt(n)) + 1 + k);
         }
@@ -96,6 +140,18 @@ namespace RSA
             Console.WriteLine("d = " + d);
 
             return d;
+        }
+
+        public static string decryption(string s, ulong d, ulong n)
+        {
+            // m[i] = s[i]^d mod n
+            //s^(eiler(n))=1 mod n
+            //[s^(eiler(n))^(d/m)] *[s^(d%m)] 
+            //{[(1 mod n)^(d/m)] *[s^(d%m)] } mod n            
+            //Console.Write(m);
+            ulong m = (ulong)(Convert.ToUInt64(s));
+            m = (ulong)BigInteger.ModPow(m,d,n);          
+            return Convert.ToString(m);
         }
     }
 }
